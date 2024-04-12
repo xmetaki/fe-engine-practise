@@ -1,17 +1,34 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import Worker from '@/workers/demo.worker'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+  },
+  data() {
+    return {
+      worker: null
+    }
+  },
+  mounted() {
+    const worker = this.worker = new Worker()
+    worker.postMessage({
+      hello: 'world'
+    })
+    worker.addEventListener('message', (event) => {
+      console.log('主线程接收到了数据')
+      console.log(event.data)
+    })
+  },
+  beforeDestroy() {
+    if (this.worker) {
+      this.worker.terminate()
+      console.log('worker已经终止')
+    }
   }
 }
 </script>
